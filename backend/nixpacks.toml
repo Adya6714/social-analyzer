@@ -1,2 +1,14 @@
-[phases.setup]
-nixPkgs = ["tesseract"]
+stage-0
+RUN python -m venv --copies /opt/venv && . /opt/venv/bin/activate && pip install -r requirements.txt
+109ms
+/bin/bash: line 1: python: command not found
+Dockerfile:20
+-------------------
+18 |     ENV NIXPACKS_PATH=/opt/venv/bin:$NIXPACKS_PATH
+19 |     COPY . /app/.
+20 | >>> RUN --mount=type=cache,id=s/983a9f93-e50f-4312-8719-2b0ffe152de4-/root/cache/pip,target=/root/.cache/pip python -m venv --copies /opt/venv && . /opt/venv/bin/activate && pip install -r requirements.txt
+21 |
+22 |
+-------------------
+ERROR: failed to build: failed to solve: process "/bin/bash -ol pipefail -c python -m venv --copies /opt/venv && . /opt/venv/bin/activate && pip install -r requirements.txt" did not complete successfully: exit code: 127
+Error: Docker build failed
