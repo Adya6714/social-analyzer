@@ -1,7 +1,7 @@
 import json
 import os
 import re
-import google as genai
+from google import genai
 
 GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
 
