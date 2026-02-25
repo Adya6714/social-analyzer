@@ -1,7 +1,7 @@
 import json
 import os
 import re
-import google.generativeai as genai
+import google as genai
 
 GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
 
@@ -70,24 +70,12 @@ def mock_analysis(text: str) -> dict:
         "cta_suggestion": "What would you improve in this post? Share your take below."
     }
 
-
-
-def analyze_with_gemini(text: str) -> dict:
-    api_key = os.getenv("GEMINI_API_KEY")
-
-    if not api_key:
-        return mock_analysis(text)
-
-    print("=== USING REAL GEMINI ===")
-
-    genai.configure(api_key=api_key)
-    model = genai.GenerativeModel("gemini-2.5-flash")
-
-    prompt = f"""
+def prompt_builder(text: str) -> str:
+    return f"""
 You are a professional social media growth strategist.
 
 Analyze the following content and return STRICTLY valid JSON.
-Do not include explanations, markdown, or extra text.
+Do not include markdown or explanations.
 
 Content:
 {text}
@@ -113,8 +101,22 @@ Return JSON in exactly this format:
 }}
 """
 
+
+def analyze_with_gemini(text: str) -> dict:
+    api_key = os.getenv("GEMINI_API_KEY")
+
+    if not api_key:
+        return mock_analysis(text)
+
+    print("=== USING REAL GEMINI (NEW SDK) ===")
+
     try:
-        response = model.generate_content(prompt)
+        client = genai.Client(api_key=api_key)
+
+        response = client.models.generate_content(
+            model="gemini-2.5-flash",
+            contents=prompt_builder(text)
+        )
 
         print("RAW GEMINI RESPONSE:")
         print(response.text)
@@ -125,5 +127,3 @@ Return JSON in exactly this format:
         print("GEMINI ERROR:", e)
         print("Falling back to mock.")
         return mock_analysis(text)
-
-
